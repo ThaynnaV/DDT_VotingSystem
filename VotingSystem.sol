@@ -2,10 +2,12 @@
 pragma solidity ^0.6.4;
 
 contract Voting {
-    mapping(bytes32 => uint256) private votesReceived;
-    bytes32[] private candidateList;
-    bool private initialized;
+    
+    mapping(bytes32 => uint256) private votesReceived; // Map that store the number of votes received for each candidate
+    bytes32[] private candidateList; //Array that stores the candidates
+    bool private initialized; //function that tracks whether the contratacs has been initialized
 
+    //Function that initializes the contract with the candidate name
     function initialize(string memory candidateName1, string memory candidateName2, string memory candidateName3) public {
         require(!initialized, "Contract already initialized");
 
@@ -20,28 +22,28 @@ contract Voting {
         initialized = true;
     }
 
+    //Function to get the total votes for each candidate
     function totalVotesFor(string memory candidateName) view public returns (uint256) {
         bytes32 candidate = keccak256(abi.encodePacked(candidateName));
         require(validCandidate(candidate), "Invalid candidate");
         return votesReceived[candidate];
     }
 
+    //Function to vote in a candidate
     function voteForCandidate(string memory candidateName) public {
         bytes32 candidate = keccak256(abi.encodePacked(candidateName));
         require(validCandidate(candidate), "Invalid candidate");
         votesReceived[candidate] += 1;
     }
 
+    //Fallback function in order to the Contract works
     receive() external payable {
-        // You can implement any logic you want when receiving Ether.
-        // This function is optional if you don't plan to receive Ether directly.
     }
     
     fallback() external payable {
-        // Similar to the receive() function, you can implement logic here.
     }
 
-    // Helper function to check if a candidate is valid
+    //Function to check if a candidate is valid
     function validCandidate(bytes32 candidate) private view returns (bool) {
         for (uint256 i = 0; i < candidateList.length; i++) {
             if (candidateList[i] == candidate) {
